@@ -219,7 +219,6 @@ Graphics::Graphics( HWNDKey& key )
 	pSysBuffer = reinterpret_cast<Color*>( 
 		_aligned_malloc( sizeof( Color ) * Graphics::ScreenWidth * Graphics::ScreenHeight,16u ) );
 }
-
 Graphics::~Graphics()
 {
 	// free sysbuffer memory (aligned free)
@@ -280,13 +279,11 @@ void Graphics::EndFrame()
 		}
 	}
 }
-
 void Graphics::BeginFrame()
 {
 	// clear the sysbuffer
 	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
 }
-
 void Graphics::PutPixel( int x,int y,Color c )
 {
 	assert( x >= 0 );
@@ -309,21 +306,40 @@ void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur)
 		}
 	}
 }
-
-void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur, const RectM& rect)
+void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur, RectM rect, const RectM& clip)
 {
-	const int width = rect.width;
-	const int height = rect.height;
+	assert(rect.left >= 0);
+	assert(rect.right <= sur.GetWidth());
+	assert(rect.top >= 0);
+	assert(rect.bottom <= sur.GetHeight());
 
-	for (int sy = rect.left; sy < height; sy++)
+	if (x < clip.left)
 	{
-		for (int sx = rect.top; sx < width; sx++)
+		rect.left += clip.left - x;
+		x = clip.left;
+	}
+	if (y < clip.top)
+	{
+		rect.top += clip.top - y;
+		y = clip.top;
+	}
+	if (x + rect.GetWidth() > clip.right)
+	{
+		rect.right -= x - rect.GetWidth() - clip.right;
+	}
+	if (y + rect.GetHeight() < clip.top)
+	{
+		rect.top -= x - rect.GetHeight() - clip.top;
+	}
+
+	for (int sy = rect.left; sy < rect.GetWidth(); sy++)
+	{
+		for (int sx = rect.top; sx < rect.GetHeight(); sx++)
 		{
 			PutPixel(x + sx, y + sy, sur.GetPixel(sx, sy));
 		}
 	}
 }
-
 void Graphics::DrawSprite(int x, int y, const Surface& sur, const Color& chroma)
 {
 	const int width = sur.GetWidth();
@@ -345,7 +361,6 @@ void Graphics::DrawSprite(int x, int y, const Surface& sur, const Color& chroma)
 		}
 	}
 }
-
 
 //////////////////////////////////////////////////
 //           Graphics Exception

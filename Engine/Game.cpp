@@ -8,7 +8,7 @@ Game::Game( MainWindow& wnd )
 {
 	for (int i = 0; i < nSurfs; i++)
 	{
-		const std::string surfsPath = "fft\\upload (" + std::to_string(i) + ").bmp";
+		const std::string surfsPath = "kud50px\\upload (" + std::to_string(i) + ").bmp";
 		surfs[i].Init(surfsPath);
 	}
 }
@@ -35,5 +35,5 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	gfx.DrawSpriteNoChroma(0, 0, surfs[int(currFrame)]);
+	gfx.DrawSpriteNoChroma(wnd.mouse.GetPosX(), wnd.mouse.GetPosY(), surfs[int(currFrame)], { 0, 45, 0, 45 }, { 300, 100, 300, 100 });
 }

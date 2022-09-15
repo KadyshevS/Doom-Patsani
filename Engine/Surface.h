@@ -1,5 +1,6 @@
 #pragma once
 #include "Colors.h"
+#include "RectM.h"
 #include <string>
 
 class Surface
@@ -14,10 +15,18 @@ public:
 	{
 		Init(filename);
 	}
-	Surface(int Width, int Height);
-	Surface(const Surface& oth);
+	Surface(int Width, int Height)
+	{
+		Init(Width, Height);
+	}
+	Surface(const Surface& oth)
+	{
+		Init(oth);
+	}
 
 	void Init(const std::string& filename);
+	void Init(int Width, int Height);
+	void Init(const Surface& oth);
 
 	Surface& operator = (const Surface& oth);
 	void PutPixel(int X, int Y, Color Color);
