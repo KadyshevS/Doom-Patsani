@@ -35,5 +35,10 @@ void Game::UpdateModel()
 
 void Game::ComposeFrame()
 {
-	gfx.DrawSpriteNoChroma(wnd.mouse.GetPosX(), wnd.mouse.GetPosY(), surfs[int(currFrame)], { 0, 45, 0, 45 }, { 300, 100, 300, 100 });
+	gfx.DrawSpriteNoChroma(
+		wnd.mouse.GetPosX(), 
+		wnd.mouse.GetPosY(), 
+		{ 0, 50, 0, 50 }, 
+		gfx.GetScreenRect(),
+		surfs[int(currFrame)]);
 }

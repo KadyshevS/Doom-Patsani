@@ -231,6 +231,8 @@ Graphics::~Graphics()
 	if( pImmediateContext ) pImmediateContext->ClearState();
 }
 
+
+
 void Graphics::EndFrame()
 {
 	HRESULT hr;
@@ -306,7 +308,7 @@ void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur)
 		}
 	}
 }
-void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur, RectM rect, const RectM& clip)
+void Graphics::DrawSpriteNoChroma(int x, int y, RectM rect, const RectM& clip, const Surface& sur)
 {
 	assert(rect.left >= 0);
 	assert(rect.right <= sur.GetWidth());
@@ -325,18 +327,18 @@ void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur, RectM rect, 
 	}
 	if (x + rect.GetWidth() > clip.right)
 	{
-		rect.right -= x - rect.GetWidth() - clip.right;
+		rect.right -= x + rect.GetWidth() - clip.right;
 	}
-	if (y + rect.GetHeight() < clip.top)
+	if (y + rect.GetHeight() > clip.bottom)
 	{
-		rect.top -= x - rect.GetHeight() - clip.top;
+		rect.bottom -= y + rect.GetHeight() - clip.bottom;
 	}
 
-	for (int sy = rect.left; sy < rect.GetWidth(); sy++)
+	for (int sy = rect.top; sy < rect.bottom; sy++)
 	{
-		for (int sx = rect.top; sx < rect.GetHeight(); sx++)
+		for (int sx = rect.left; sx < rect.right; sx++)
 		{
-			PutPixel(x + sx, y + sy, sur.GetPixel(sx, sy));
+			PutPixel(x + sx - rect.left, y + sy - rect.top, sur.GetPixel(sx, sy));
 		}
 	}
 }
@@ -360,6 +362,11 @@ void Graphics::DrawSprite(int x, int y, const Surface& sur, const Color& chroma)
 			}
 		}
 	}
+}
+
+RectM Graphics::GetScreenRect()
+{
+	return RectM(0, ScreenHeight-1, 0, ScreenWidth-1);
 }
 
 //////////////////////////////////////////////////
