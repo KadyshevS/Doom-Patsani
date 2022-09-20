@@ -1,24 +1,7 @@
 #include "Surface.h"
-#include <cassert>
 #include "ChiliWin.h"
+#include <cassert>
 #include <fstream>
-
-Surface::Surface(int Width, int Height)
-	:
-	width(Width),
-	height(Height),
-	nPixels(Width*Height),
-	pPixels(new Color[Width*Height])
-{}
-Surface::Surface(const Surface& oth)
-	:
-	Surface(oth.width, oth.height)
-{
-	for (int i = 0; i < nPixels; i++)
-	{
-		pPixels[i] = oth.pPixels[i];
-	}
-}
 
 void Surface::Init(const std::string& filename)
 {
@@ -73,6 +56,21 @@ void Surface::Init(const std::string& filename)
 		{
 			in.seekg(padding, std::ios::cur);
 		}
+	}
+}
+void Surface::Init(int Width, int Height)
+{
+	width = Width;
+	height = Height;
+	nPixels = Width * Height;
+	pPixels = new Color[Width*Height];
+}
+void Surface::Init(const Surface& oth)
+{
+	Init(oth.width, oth.height);
+	for (int i = 0; i < nPixels; i++)
+	{
+		pPixels[i] = oth.pPixels[i];
 	}
 }
 

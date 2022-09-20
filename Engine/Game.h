@@ -24,16 +24,18 @@ private:
 	Graphics gfx;
 	/********************************/
 	/*  User Variables              */
-	FrameTimer ft;
+
+	FrameTimer ft; //	FrameTimer
+
+#ifndef NDEBUG
+	float dSpeed = 2.f * 60.0f;
+#else
+	float dSpeed = 0.895f * 60.0f;
+#endif
 
 	static const short nSurfs = 30;
 	float currFrame = 0.f;
 	Surface surfs[nSurfs];
 
-#ifndef NDEBUG
-	float dSpeed = 4.f * 60.0f;
-#else
-	float dSpeed = 0.895f * 60.0f;
-#endif
 	/********************************/
 };

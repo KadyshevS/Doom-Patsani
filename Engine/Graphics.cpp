@@ -219,7 +219,6 @@ Graphics::Graphics( HWNDKey& key )
 	pSysBuffer = reinterpret_cast<Color*>( 
 		_aligned_malloc( sizeof( Color ) * Graphics::ScreenWidth * Graphics::ScreenHeight,16u ) );
 }
-
 Graphics::~Graphics()
 {
 	// free sysbuffer memory (aligned free)
@@ -231,6 +230,8 @@ Graphics::~Graphics()
 	// clear the state of the device context before destruction
 	if( pImmediateContext ) pImmediateContext->ClearState();
 }
+
+
 
 void Graphics::EndFrame()
 {
@@ -280,13 +281,11 @@ void Graphics::EndFrame()
 		}
 	}
 }
-
 void Graphics::BeginFrame()
 {
 	// clear the sysbuffer
 	memset( pSysBuffer,0u,sizeof( Color ) * Graphics::ScreenHeight * Graphics::ScreenWidth );
 }
-
 void Graphics::PutPixel( int x,int y,Color c )
 {
 	assert( x >= 0 );
@@ -309,21 +308,40 @@ void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur)
 		}
 	}
 }
-
-void Graphics::DrawSpriteNoChroma(int x, int y, const Surface& sur, const RectM& rect)
+void Graphics::DrawSpriteNoChroma(int x, int y, RectM rect, const RectM& clip, const Surface& sur)
 {
-	const int width = rect.width;
-	const int height = rect.height;
+	assert(rect.left >= 0);
+	assert(rect.right <= sur.GetWidth());
+	assert(rect.top >= 0);
+	assert(rect.bottom <= sur.GetHeight());
 
-	for (int sy = rect.left; sy < height; sy++)
+	if (x < clip.left)
 	{
-		for (int sx = rect.top; sx < width; sx++)
+		rect.left += clip.left - x;
+		x = clip.left;
+	}
+	if (y < clip.top)
+	{
+		rect.top += clip.top - y;
+		y = clip.top;
+	}
+	if (x + rect.GetWidth() > clip.right)
+	{
+		rect.right -= x + rect.GetWidth() - clip.right;
+	}
+	if (y + rect.GetHeight() > clip.bottom)
+	{
+		rect.bottom -= y + rect.GetHeight() - clip.bottom;
+	}
+
+	for (int sy = rect.top; sy < rect.bottom; sy++)
+	{
+		for (int sx = rect.left; sx < rect.right; sx++)
 		{
-			PutPixel(x + sx, y + sy, sur.GetPixel(sx, sy));
+			PutPixel(x + sx - rect.left, y + sy - rect.top, sur.GetPixel(sx, sy));
 		}
 	}
 }
-
 void Graphics::DrawSprite(int x, int y, const Surface& sur, const Color& chroma)
 {
 	const int width = sur.GetWidth();
@@ -346,6 +364,10 @@ void Graphics::DrawSprite(int x, int y, const Surface& sur, const Color& chroma)
 	}
 }
 
+RectM Graphics::GetScreenRect()
+{
+	return RectM(0, ScreenHeight-1, 0, ScreenWidth-1);
+}
 
 //////////////////////////////////////////////////
 //           Graphics Exception
